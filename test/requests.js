@@ -992,6 +992,28 @@ var tests = function(web3) {
       });
     });
 
+    it("should create a contract and get the corresponding transaction with eth_getTransactionByHash", function(done){
+      web3.eth.sendTransaction({
+        from: accounts[0],
+        value: '0x3141592',
+        gas: 3141592,
+        data: contract.binary
+      }, function(err,hash){
+        web3.currentProvider.send({
+          id: new Date().getTime(),
+          jsonrpc: "2.0",
+          method: "eth_getTransactionByHash",
+          params: [hash]
+        }, function(err,result){
+          if (err) return done(err);
+          assert.notEqual(result, null);
+          // Confirm that the "to" property is set to null
+          assert.equal(result.result.to, null);
+          done();
+        });
+      });
+    });
+
     it("should verify there's code at the address (eth_getCode)", function(done) {
       web3.eth.getCode(contractAddress, function(err, result) {
         if (err) return done(err);
